@@ -18,8 +18,9 @@ export class AppService {
     }
   }
 
-  async generateEndpoint(): Promise<string> {
+  async generateEndpoint(): Promise<any> {
     const newEndpoint = AppService.generateRandomEndpoint(64, '#aA');
+    console.log(newEndpoint);
     const endpointExists = await this.findEndpoint(newEndpoint);
     if (endpointExists) {
       await this.generateEndpoint();
