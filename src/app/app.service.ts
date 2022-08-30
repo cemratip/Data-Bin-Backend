@@ -41,6 +41,16 @@ export class AppService {
     }
   }
 
+  async deletePassword(endpointDto: Endpoint) {
+    const endpointExists = await this.findEndpoint(endpointDto.endpoint);
+    if (endpointExists) {
+      await this.endpointModel.updateOne(
+        { endpoint: endpointDto.endpoint },
+        { $unset: { password: '' } },
+      );
+    }
+  }
+
   private async createEndpoint(endpointDto: Endpoint) {
     const newEndpoint = new this.endpointModel(endpointDto);
     await newEndpoint.save();

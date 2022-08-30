@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Endpoint } from './app.model';
 
@@ -19,5 +19,10 @@ export class AppController {
   @Post()
   createEndpoint(@Body() endpointDto: Endpoint) {
     return this.appService.writeToEndpoint(endpointDto);
+  }
+
+  @Delete()
+  deletePassword(@Body() endpointDto: Endpoint) {
+    return this.appService.deletePassword(endpointDto);
   }
 }
