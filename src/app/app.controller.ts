@@ -18,11 +18,7 @@ export class AppController {
 
   @Post()
   createEndpoint(@Body() endpointDto: Endpoint) {
+    console.log(endpointDto);
     return this.appService.writeToEndpoint(endpointDto);
-  }
-
-  @Delete()
-  deletePassword(@Body() endpointDto: Endpoint) {
-    return this.appService.deletePassword(endpointDto);
   }
 }
