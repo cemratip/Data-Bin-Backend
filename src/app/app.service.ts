@@ -9,9 +9,12 @@ export class AppService {
     @InjectModel('Endpoint') private readonly endpointModel: Model<Endpoint>,
   ) {}
 
-  async getEndpointData(endpointToFind: string): Promise<Endpoint> {
+  async getEndpointData(endpointToFind: string): Promise<any> {
     const endpoint = await this.findEndpoint(endpointToFind);
     if (endpoint) {
+      if (endpoint.passworded) {
+        return endpoint['passworded'];
+      }
       return endpoint;
     } else {
       throw new NotFoundException('This link does not exist.');

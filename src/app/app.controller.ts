@@ -7,7 +7,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get(':endpoint')
-  getEndpoint(@Param() endpointDto: Endpoint): Promise<Endpoint> {
+  getEndpoint(@Param() endpointDto: Endpoint): Promise<any> {
     return this.appService.getEndpointData(endpointDto.endpoint);
   }
 
