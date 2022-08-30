@@ -25,7 +25,7 @@ export class AppService {
     if (endpointExists) {
       await this.generateEndpoint();
     } else {
-      return 'https://data-bin.herkuapp.com/' + newEndpoint;
+      return newEndpoint;
     }
   }
 
