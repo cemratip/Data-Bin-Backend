@@ -12,10 +12,29 @@ export class AppService {
   async getEndpointData(endpointToFind: string): Promise<any> {
     const endpoint = await this.findEndpoint(endpointToFind);
     if (endpoint) {
-      if (endpoint.passworded) {
-        return endpoint['passworded'];
-      }
-      return endpoint;
+      return {
+        expiry_time: endpoint.expiry_time,
+        editable: endpoint.editable,
+        text_content: endpoint.text_content,
+      };
+    } else {
+      throw new NotFoundException('This link does not exist.');
+    }
+  }
+
+  async getPassworded(endpointToFind: string): Promise<boolean> {
+    const endpoint = await this.findEndpoint(endpointToFind);
+    if (endpoint) {
+      return endpoint.passworded;
+    } else {
+      throw new NotFoundException('This link does not exist.');
+    }
+  }
+
+  async verifyPassword(endpointDto: Endpoint): Promise<boolean> {
+    const endpointExists = await this.findEndpoint(endpointDto.endpoint);
+    if (endpointExists) {
+      return endpointDto.password == endpointExists.password;
     } else {
       throw new NotFoundException('This link does not exist.');
     }
@@ -23,7 +42,6 @@ export class AppService {
 
   async generateEndpoint(): Promise<any> {
     const newEndpoint = AppService.generateRandomEndpoint(64, '#aA');
-    console.log(newEndpoint);
     const endpointExists = await this.findEndpoint(newEndpoint);
     if (endpointExists) {
       await this.generateEndpoint();
