@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Endpoint } from './app.model';
+import * as bcrypt from 'bcryptjs';
+import { ExpiryTimeEnum } from './expiry-time.enum';
 
 @Injectable()
 export class AppService {
@@ -13,7 +15,7 @@ export class AppService {
     const endpoint = await this.findEndpoint(endpointToFind);
     if (endpoint) {
       return {
-        expiry_time: endpoint.expiry_time,
+        expireAt: endpoint.expireAt,
         editable: endpoint.editable,
         text_content: endpoint.text_content,
       };
@@ -34,7 +36,10 @@ export class AppService {
   async verifyPassword(endpointDto: Endpoint): Promise<boolean> {
     const endpointExists = await this.findEndpoint(endpointDto.endpoint);
     if (endpointExists) {
-      return endpointDto.password == endpointExists.password;
+      return await bcrypt.compare(
+        endpointDto.password,
+        endpointExists.password,
+      );
     } else {
       throw new NotFoundException('This link does not exist.');
     }
@@ -60,8 +65,22 @@ export class AppService {
   }
 
   private async createEndpoint(endpointDto: Endpoint) {
+    const addOn = ExpiryTimeEnum[endpointDto.timeTillExpiry];
+
     const newEndpoint = new this.endpointModel(endpointDto);
     await newEndpoint.save();
+
+    const currentExpireAt = newEndpoint.createdAt;
+    const newExpireAt = currentExpireAt.setSeconds(
+      currentExpireAt.getSeconds() + addOn,
+    );
+
+    await this.endpointModel
+      .updateOne(
+        { endpoint: endpointDto.endpoint },
+        { expireAt: new Date(newExpireAt) },
+      )
+      .exec();
   }
 
   private async editEndpoint(endpointDto: Endpoint) {

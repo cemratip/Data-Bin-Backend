@@ -26,12 +26,8 @@ export class AppController {
     return this.appService.writeToEndpoint(endpointDto);
   }
 
-  @Post('/verify')
+  @Post('verify')
   verifyPassword(@Body() endpointDto: Endpoint): Promise<boolean> {
     return this.appService.verifyPassword(endpointDto);
   }
-
-  // TODO: BACKEND - STORE EXPIRY_DATETIME INSTEAD OF E.G. '1h'
-  // TODO: MAKE RECORDS SELF DESTRUCT WHEN EXPIRY TIME REACHED
-  // TODO: ENCRYPT PASSWORDS
 }
