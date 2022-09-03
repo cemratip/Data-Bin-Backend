@@ -57,6 +57,7 @@ export class AppService {
 
   async writeToEndpoint(endpointDto: Endpoint) {
     const endpointExists = await this.findEndpoint(endpointDto.endpoint);
+    console.log(endpointDto);
     if (endpointExists) {
       await this.editEndpoint(endpointDto);
     } else {
@@ -65,27 +66,30 @@ export class AppService {
   }
 
   private async createEndpoint(endpointDto: Endpoint) {
-    const addOn = ExpiryTimeEnum[endpointDto.timeTillExpiry];
-
     const newEndpoint = new this.endpointModel(endpointDto);
     await newEndpoint.save();
-
-    const currentExpireAt = newEndpoint.createdAt;
-    const newExpireAt = currentExpireAt.setSeconds(
-      currentExpireAt.getSeconds() + addOn,
-    );
-
-    await this.endpointModel
-      .updateOne(
-        { endpoint: endpointDto.endpoint },
-        { expireAt: new Date(newExpireAt) },
-      )
-      .exec();
+    await this.updateTime(newEndpoint);
   }
 
   private async editEndpoint(endpointDto: Endpoint) {
     await this.endpointModel
       .updateOne({ endpoint: endpointDto.endpoint }, endpointDto)
+      .exec();
+    await this.updateTime(endpointDto);
+  }
+
+  private async updateTime(endpointDto: Endpoint) {
+    const updatedDto = await this.findEndpoint(endpointDto.endpoint);
+    const addOn = ExpiryTimeEnum[endpointDto.timeTillExpiry];
+    const currentExpireAt = updatedDto.createdAt;
+    const newExpireAt = currentExpireAt.setSeconds(
+      currentExpireAt.getSeconds() + addOn,
+    );
+    await this.endpointModel
+      .updateOne(
+        { endpoint: endpointDto.endpoint },
+        { expireAt: new Date(newExpireAt) },
+      )
       .exec();
   }
 
