@@ -9,7 +9,7 @@ export const EndpointSchema = new mongoose.Schema(
     text_content: { type: String, required: false },
     timeTillExpiry: { type: String, required: true },
     expireAt: { type: Date, expires: 60 },
-    createdAt: { type: Date, default: Date.now() },
+    createdAt: { type: Date },
   },
   { timestamps: true },
 );
